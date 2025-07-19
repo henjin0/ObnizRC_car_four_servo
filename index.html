@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -19,7 +20,7 @@
             -ms-user-select: none;
             user-select: none;
         }
-        
+
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
@@ -28,13 +29,13 @@
             height: 100vh;
             width: 100vw;
         }
-        
+
         .app-container {
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        
+
         .header {
             background: rgba(15, 20, 25, 0.9);
             padding: 8px 15px;
@@ -44,14 +45,14 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .header h1 {
             color: #4fc3f7;
             font-size: 1.2rem;
             font-weight: bold;
             margin: 0;
         }
-        
+
         .settings-btn {
             background: linear-gradient(45deg, #4fc3f7, #29b6f6);
             color: white;
@@ -62,12 +63,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .settings-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 3px 10px rgba(79, 195, 247, 0.4);
         }
-        
+
         .connection-bar {
             display: flex;
             align-items: center;
@@ -77,26 +78,26 @@
             background: rgba(22, 33, 62, 0.8);
             flex-wrap: wrap;
         }
-        
+
         .status-indicator {
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: bold;
         }
-        
+
         .status-indicator.connected {
             background: rgba(76, 175, 80, 0.2);
             border: 1px solid #4caf50;
             color: #4caf50;
         }
-        
+
         .status-indicator.disconnected {
             background: rgba(244, 67, 54, 0.2);
             border: 1px solid #f44336;
             color: #f44336;
         }
-        
+
         .connect-disconnect-btn {
             background: linear-gradient(45deg, #4fc3f7, #29b6f6);
             color: white;
@@ -108,28 +109,28 @@
             transition: all 0.3s ease;
             margin: 5px;
         }
-        
+
         .connect-disconnect-btn:disabled {
             background: #666;
             cursor: not-allowed;
         }
-        
+
         .connect-disconnect-btn.disconnect {
             background: linear-gradient(45deg, #f44336, #d32f2f);
         }
-        
+
         .controller-area {
             flex: 1;
             display: none;
             padding: 15px;
             overflow: hidden;
         }
-        
+
         .controller-area.active {
             display: flex;
             flex-direction: column;
         }
-        
+
         .sticks-container {
             flex: 1;
             display: flex;
@@ -138,7 +139,7 @@
             gap: 20px;
             min-height: 0;
         }
-        
+
         .stick-section {
             flex: 1;
             display: flex;
@@ -147,7 +148,7 @@
             height: 100%;
             max-width: 45%;
         }
-        
+
         .stick-label {
             font-size: 14px;
             color: #4fc3f7;
@@ -155,7 +156,7 @@
             font-weight: bold;
             text-align: center;
         }
-        
+
         .stick-container {
             background: radial-gradient(circle at center, #0f1419 0%, #1a1a2e 100%);
             border: 3px solid #4fc3f7;
@@ -163,12 +164,12 @@
             width: min(35vw, 160px);
             height: min(35vw, 160px);
             position: relative;
-            box-shadow: 
+            box-shadow:
                 inset 0 0 20px rgba(79, 195, 247, 0.3),
                 0 0 30px rgba(79, 195, 247, 0.2);
             margin-bottom: 10px;
         }
-        
+
         .stick-value {
             font-size: 12px;
             color: #fff;
@@ -183,7 +184,7 @@
             justify-content: center;
             width: 100%;
         }
-        
+
         .control-panel {
             background: rgba(22, 33, 62, 0.9);
             padding: 10px;
@@ -191,7 +192,7 @@
             margin-top: 10px;
             backdrop-filter: blur(10px);
         }
-        
+
         .emergency-stop {
             background: linear-gradient(45deg, #f44336, #d32f2f);
             color: white;
@@ -204,7 +205,7 @@
             width: 100%;
             box-shadow: 0 3px 10px rgba(244, 67, 54, 0.3);
         }
-        
+
         /* 設定ポップアップ */
         .settings-overlay {
             position: fixed;
@@ -219,11 +220,11 @@
             align-items: center;
             z-index: 1000;
         }
-        
+
         .settings-overlay.active {
             display: flex;
         }
-        
+
         .settings-modal {
             background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
             border: 2px solid #4fc3f7;
@@ -235,7 +236,7 @@
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        
+
         .settings-title {
             color: #4fc3f7;
             font-size: 1.5rem;
@@ -243,11 +244,11 @@
             text-align: center;
             font-weight: bold;
         }
-        
+
         .setting-group {
             margin-bottom: 20px;
         }
-        
+
         .setting-label {
             color: #4fc3f7;
             font-size: 14px;
@@ -255,7 +256,7 @@
             margin-bottom: 8px;
             display: block;
         }
-        
+
         .setting-input {
             width: 100%;
             padding: 10px 15px;
@@ -266,13 +267,13 @@
             color: white;
             text-align: center;
         }
-        
+
         .setting-input:focus {
             outline: none;
             border-color: #29b6f6;
             box-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
         }
-        
+
         .trim-control {
             display: flex;
             align-items: center;
@@ -282,13 +283,13 @@
             border-radius: 10px;
             border: 1px solid #4fc3f7;
         }
-        
+
         .trim-buttons {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .trim-btn {
             background: #16213e;
             color: white;
@@ -300,12 +301,12 @@
             min-width: 40px;
             transition: all 0.3s ease;
         }
-        
+
         .trim-btn:hover {
             background: #4fc3f7;
             color: #1a1a2e;
         }
-        
+
         .trim-value {
             font-size: 16px;
             color: #fff;
@@ -313,13 +314,13 @@
             text-align: center;
             font-weight: bold;
         }
-        
+
         .settings-buttons {
             display: flex;
             gap: 15px;
             margin-top: 30px;
         }
-        
+
         .btn-primary {
             flex: 1;
             background: linear-gradient(45deg, #4fc3f7, #29b6f6);
@@ -332,12 +333,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(79, 195, 247, 0.4);
         }
-        
+
         .btn-secondary {
             flex: 1;
             background: rgba(244, 67, 54, 0.8);
@@ -350,11 +351,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-secondary:hover {
             background: #f44336;
         }
-        
+
         .first-time-message {
             background: rgba(79, 195, 247, 0.1);
             border: 1px solid #4fc3f7;
@@ -365,59 +366,99 @@
             text-align: center;
             font-size: 14px;
         }
-        
+
+        .gpio-info {
+            background: rgba(15, 20, 25, 0.8);
+            border: 1px solid #4fc3f7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .gpio-info h4 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .gpio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .gpio-table th,
+        .gpio-table td {
+            padding: 4px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+            font-size: 11px;
+        }
+
+        .gpio-table th {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+
+        .gpio-table td {
+            color: #fff;
+        }
+
         /* レスポンシブデザイン */
         @media (max-width: 480px) {
             .header h1 {
                 font-size: 1rem;
             }
-            
+
             .controller-area {
                 padding: 10px;
             }
-            
+
             .stick-label {
                 font-size: 12px;
             }
-            
+
             .stick-container {
                 width: min(38vw, 140px);
                 height: min(38vw, 140px);
             }
-            
+
             .emergency-stop {
                 font-size: 14px;
                 padding: 10px 16px;
             }
         }
-        
+
         @media (orientation: landscape) and (max-height: 600px) {
             .header {
                 padding: 4px 15px;
             }
-            
+
             .header h1 {
                 font-size: 1rem;
             }
-            
+
             .connection-bar {
                 padding: 4px;
             }
-            
+
             .controller-area {
                 padding: 8px;
             }
-            
+
             .stick-container {
                 width: min(25vh, 120px);
                 height: min(25vh, 120px);
             }
-            
+
             .control-panel {
                 padding: 6px;
                 margin-top: 6px;
             }
-            
+
             .emergency-stop {
                 padding: 8px 16px;
                 font-size: 14px;
@@ -425,34 +466,35 @@
         }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <div class="header">
             <h1>🎮 RC プロポコントローラー</h1>
             <button id="settingsBtn" class="settings-btn">⚙️ 設定</button>
         </div>
-        
+
         <div class="connection-bar">
             <button id="connectBtn" class="connect-disconnect-btn">接続</button>
             <button id="disconnectBtn" class="connect-disconnect-btn disconnect" style="display: none;">切断</button>
             <div id="status" class="status-indicator disconnected">未接続</div>
         </div>
-        
+
         <!-- 設定ポップアップ -->
         <div id="settingsOverlay" class="settings-overlay">
             <div class="settings-modal">
                 <div class="settings-title">⚙️ 設定</div>
-                
+
                 <div id="firstTimeMessage" class="first-time-message" style="display: none;">
                     <strong>🎮 初回セットアップ</strong><br>
                     まずはObniz IDを設定してコントローラーを使い始めましょう！
                 </div>
-                
+
                 <div class="setting-group">
                     <label class="setting-label">🔗 Obniz ID</label>
                     <input type="text" id="settingsObnizId" class="setting-input" placeholder="例: 1234-5678">
                 </div>
-                
+
                 <div class="setting-group">
                     <label class="setting-label">🎯 ステアリング トリム</label>
                     <div class="trim-control">
@@ -464,7 +506,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="setting-group">
                     <label class="setting-label">⚡ スロットル トリム</label>
                     <div class="trim-control">
@@ -476,14 +518,55 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="settings-buttons">
                     <button id="saveSettings" class="btn-primary">💾 保存</button>
                     <button id="cancelSettings" class="btn-secondary">❌ キャンセル</button>
                 </div>
+
+                <div class="gpio-info">
+                    <h4>🔌 補足：GPIO接続図</h4>
+                    <table class="gpio-table">
+                        <tr>
+                            <th>Pin</th>
+                            <th>機能</th>
+                            <th>接続先</th>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>ステア信号</td>
+                            <td>角度サーボ 信号線（黄/橙）</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>ステア電源</td>
+                            <td>角度サーボ 電源線（赤）</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>ステアGND</td>
+                            <td>角度サーボ GND線（黒/茶）</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>駆動信号</td>
+                            <td>ローテーションサーボ 信号線（黄/橙）</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>駆動電源</td>
+                            <td>ローテーションサーボ 電源線（赤）</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>駆動GND</td>
+                            <td>ローテーションサーボ GND線（黒/茶）</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
-        
+
         <div id="controllerArea" class="controller-area">
             <div class="sticks-container">
                 <div class="stick-section">
@@ -494,7 +577,7 @@
                         <div>PWM: <span id="steerPwm">1.5ms</span></div>
                     </div>
                 </div>
-                
+
                 <div class="stick-section">
                     <div class="stick-label">⚡ スロットル (Ch2)</div>
                     <div id="throttleStick" class="stick-container"></div>
@@ -504,7 +587,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="control-panel">
                 <button id="emergencyStop" class="emergency-stop">🛑 緊急停止</button>
             </div>
@@ -518,7 +601,7 @@
         let driveServo = null;
         let steerManager = null;
         let throttleManager = null;
-        
+
         // RC設定
         const RC_CONFIG = {
             frequency: 50,
@@ -527,27 +610,27 @@
             steerTrim: 0,
             throttleTrim: 0
         };
-        
+
         // 設定管理
         const SETTINGS_KEY = 'rcPropoSettings';
-        
+
         // 現在の値
         let currentSteer = 0;
         let currentThrottle = 0;
-        
+
         // PWM計算 (1.0ms～2.0ms)
         function calculatePWM(value, trim = 0) {
             const trimOffset = trim * 0.01;
             const adjustedValue = Math.max(-1, Math.min(1, value + trimOffset));
             return 1.0 + (adjustedValue + 1.0) * 0.5;
         }
-        
+
         // ステア角度計算
         function calculateSteerAngle(x, trim = 0) {
             const trimOffset = trim * 2;
             return Math.round(90 + (x * 90) + trimOffset);
         }
-        
+
         // スロットル状態
         function getThrottleDescription(y) {
             if (Math.abs(y) < 0.05) return "停止";
@@ -558,7 +641,7 @@
             if (y < -0.3) return "中速後進";
             return "低速後進";
         }
-        
+
         // 設定の読み込み
         function loadSettings() {
             const saved = localStorage.getItem(SETTINGS_KEY);
@@ -570,7 +653,7 @@
             }
             return null;
         }
-        
+
         // 設定の保存
         function saveSettings(obnizId) {
             const settings = {
@@ -580,30 +663,30 @@
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         }
-        
+
         // 設定画面表示
         function showSettings(isFirstTime = false) {
             const overlay = document.getElementById('settingsOverlay');
             const firstTimeMsg = document.getElementById('firstTimeMessage');
             const obnizInput = document.getElementById('settingsObnizId');
-            
+
             const saved = loadSettings();
             if (saved && saved.obnizId) {
                 obnizInput.value = saved.obnizId;
             }
-            
+
             document.getElementById('settingsSteerTrim').textContent = RC_CONFIG.steerTrim;
             document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
-            
+
             firstTimeMsg.style.display = isFirstTime ? 'block' : 'none';
             overlay.classList.add('active');
         }
-        
+
         // 設定画面非表示
         function hideSettings() {
             document.getElementById('settingsOverlay').classList.remove('active');
         }
-        
+
         // 設定画面のトリム調整
         function adjustSettingTrim(type, direction) {
             if (type === 'steer') {
@@ -613,67 +696,67 @@
                 RC_CONFIG.throttleTrim = Math.max(-10, Math.min(10, RC_CONFIG.throttleTrim + direction));
                 document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
             }
-            
+
             if (steerServo && driveServo) {
                 updateServos();
             }
         }
-        
+
         // Obniz接続
         async function connectObniz() {
             const saved = loadSettings();
             const obnizId = saved?.obnizId?.trim();
-            
+
             if (!obnizId) {
                 showSettings(true);
                 return;
             }
-            
+
             try {
                 document.getElementById('connectBtn').disabled = true;
                 document.getElementById('status').textContent = '接続中...';
-                
+
                 obniz = new Obniz(obnizId);
-                
+
                 obniz.onconnect = async () => {
                     console.log('RC プロポ接続成功');
-                    
+
                     obniz.io1.output(true);
                     obniz.io2.output(false);
                     obniz.io4.output(true);
                     obniz.io5.output(false);
-                    
-                    steerServo = obniz.wired("ServoMotor", { 
-                        signal: RC_CONFIG.steerPin, vcc: 1, gnd: 2 
+
+                    steerServo = obniz.wired("ServoMotor", {
+                        signal: RC_CONFIG.steerPin, vcc: 1, gnd: 2
                     });
-                    driveServo = obniz.wired("ServoMotor", { 
-                        signal: RC_CONFIG.drivePin, vcc: 4, gnd: 5 
+                    driveServo = obniz.wired("ServoMotor", {
+                        signal: RC_CONFIG.drivePin, vcc: 4, gnd: 5
                     });
-                    
+
                     steerServo.angle(90);
                     driveServo.angle(90);
-                    
+
                     document.getElementById('status').textContent = '接続済み';
                     document.getElementById('status').className = 'status-indicator connected';
                     document.getElementById('connectBtn').style.display = 'none';
                     document.getElementById('disconnectBtn').style.display = 'inline-block';
                     document.getElementById('controllerArea').classList.add('active');
-                    
+
                     initSticks();
                 };
-                
+
                 obniz.onclose = () => {
                     console.log('RC プロポ切断');
                     resetConnection();
                 };
-                
+
             } catch (error) {
                 console.error('接続エラー:', error);
                 alert('接続に失敗しました: ' + error.message);
                 resetConnection();
             }
         }
-        
+
         // 切断
         function disconnectObniz() {
             if (obniz) obniz.close();
@@ -681,7 +764,7 @@
             if (throttleManager) throttleManager.destroy();
             resetConnection();
         }
-        
+
         // 接続リセット
         function resetConnection() {
             document.getElementById('status').textContent = '未接続';
@@ -690,19 +773,19 @@
             document.getElementById('connectBtn').disabled = false;
             document.getElementById('disconnectBtn').style.display = 'none';
             document.getElementById('controllerArea').classList.remove('active');
-            
+
             steerManager = null;
             throttleManager = null;
             currentSteer = 0;
             currentThrottle = 0;
-            
+
             updateDisplay();
         }
-        
+
         // スティック初期化
         function initSticks() {
             console.log('スティック初期化開始');
-            
+
             const stickOptions = {
                 mode: 'static',
                 position: { left: '50%', top: '50%' },
@@ -715,7 +798,7 @@
                 lockX: false,
                 lockY: false
             };
-            
+
             if (steerManager) {
                 steerManager.destroy();
                 steerManager = null;
@@ -724,20 +807,20 @@
                 throttleManager.destroy();
                 throttleManager = null;
             }
-            
+
             const steerZone = document.getElementById('steerStick');
             const throttleZone = document.getElementById('throttleStick');
-            
+
             steerManager = nipplejs.create({
                 zone: steerZone,
                 ...stickOptions
             });
-            
+
             throttleManager = nipplejs.create({
                 zone: throttleZone,
                 ...stickOptions
             });
-            
+
             // ステアリングイベント
             steerManager.on('move', (evt, data) => {
                 if (data.vector) {
@@ -746,12 +829,12 @@
                     updateServos();
                 }
             });
-            
+
             steerManager.on('end', (evt, data) => {
                 currentSteer = 0;
                 updateServos();
             });
-            
+
             // スロットルイベント
             throttleManager.on('move', (evt, data) => {
                 if (data.vector) {
@@ -761,45 +844,45 @@
                     updateServos();
                 }
             });
-            
+
             throttleManager.on('end', (evt, data) => {
                 currentThrottle = 0;
                 updateServos();
             });
-            
+
             console.log('スティックイベントリスナー設定完了');
         }
-        
+
         // サーボ制御
         function updateServos() {
             if (!steerServo || !driveServo) return;
-            
+
             try {
                 const steerAngle = calculateSteerAngle(currentSteer, RC_CONFIG.steerTrim);
                 const throttleAngle = 90 + ((currentThrottle + RC_CONFIG.throttleTrim * 0.1) * 90);
-                
+
                 steerServo.angle(Math.max(0, Math.min(180, steerAngle)));
                 driveServo.angle(Math.max(0, Math.min(180, throttleAngle)));
-                
+
                 updateDisplay();
-                
+
             } catch (error) {
                 console.error('サーボ制御エラー:', error);
             }
         }
-        
+
         // 表示更新
         function updateDisplay() {
             const steerPwm = calculatePWM(currentSteer, RC_CONFIG.steerTrim * 0.1);
             const throttlePwm = calculatePWM(currentThrottle, RC_CONFIG.throttleTrim * 0.1);
             const steerAngle = calculateSteerAngle(currentSteer, RC_CONFIG.steerTrim);
-            
+
             document.getElementById('steerAngle').textContent = steerAngle + '°';
             document.getElementById('steerPwm').textContent = steerPwm.toFixed(2) + 'ms';
             document.getElementById('throttleSpeed').textContent = getThrottleDescription(currentThrottle);
             document.getElementById('throttlePwm').textContent = throttlePwm.toFixed(2) + 'ms';
         }
-        
+
         // 緊急停止
         function emergencyStop() {
             if (steerServo && driveServo) {
@@ -807,21 +890,21 @@
                 driveServo.angle(90);
                 currentSteer = 0;
                 currentThrottle = 0;
-                
+
                 if (steerManager) steerManager.destroy();
                 if (throttleManager) throttleManager.destroy();
                 initSticks();
-                
+
                 updateDisplay();
             }
         }
-        
+
         // イベントリスナー
         document.getElementById('connectBtn').addEventListener('click', connectObniz);
         document.getElementById('disconnectBtn').addEventListener('click', disconnectObniz);
         document.getElementById('emergencyStop').addEventListener('click', emergencyStop);
         document.getElementById('settingsBtn').addEventListener('click', () => showSettings(false));
-        
+
         // 設定画面のイベントリスナー
         document.getElementById('saveSettings').addEventListener('click', () => {
             const obnizId = document.getElementById('settingsObnizId').value.trim();
@@ -829,43 +912,44 @@
                 alert('Obniz IDを入力してください');
                 return;
             }
-            
+
             saveSettings(obnizId);
             hideSettings();
-            
+
             if (!obniz || !obniz.connectionState) {
                 connectObniz();
             }
         });
-        
+
         document.getElementById('cancelSettings').addEventListener('click', () => {
             const saved = loadSettings();
             if (!saved || !saved.obnizId) {
                 alert('初回設定を完了してください');
                 return;
             }
-            
+
             RC_CONFIG.steerTrim = saved.steerTrim || 0;
             RC_CONFIG.throttleTrim = saved.throttleTrim || 0;
             document.getElementById('settingsSteerTrim').textContent = RC_CONFIG.steerTrim;
             document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
-            
+
             hideSettings();
         });
-        
+
         // 初期化
         window.addEventListener('load', () => {
             console.log('RC プロポコントローラー初期化開始');
-            
+
             const saved = loadSettings();
             updateDisplay();
-            
+
             if (!saved || !saved.obnizId) {
                 setTimeout(() => showSettings(true), 500);
             }
-            
+
             console.log('RC プロポコントローラー初期化完了');
         });
     </script>
 </body>
+
 </html>
