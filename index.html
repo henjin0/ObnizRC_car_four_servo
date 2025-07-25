@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Obniz RC プロポ</title>
+    <title>Obniz RC プロポ - 4サーボ対応</title>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://unpkg.com/obniz/obniz.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
@@ -171,18 +171,23 @@
         }
 
         .stick-value {
-            font-size: 12px;
+            font-size: 11px;
             color: #fff;
             text-align: center;
             background: rgba(15, 20, 25, 0.8);
             padding: 4px 8px;
             border-radius: 8px;
             border: 1px solid #4fc3f7;
-            min-height: 40px;
+            min-height: 50px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             width: 100%;
+            line-height: 1.2;
+        }
+
+        .stick-value .axis-info {
+            margin: 1px 0;
         }
 
         .control-panel {
@@ -230,7 +235,7 @@
             border: 2px solid #4fc3f7;
             border-radius: 15px;
             padding: 30px;
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -274,31 +279,52 @@
             box-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
         }
 
+        .trim-section {
+            background: rgba(15, 20, 25, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #4fc3f7;
+            margin-bottom: 15px;
+        }
+
+        .trim-section-title {
+            color: #4fc3f7;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
         .trim-control {
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: rgba(15, 20, 25, 0.5);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 8px;
+            border-radius: 8px;
             border: 1px solid #4fc3f7;
+            margin-bottom: 8px;
+        }
+
+        .trim-control:last-child {
+            margin-bottom: 0;
         }
 
         .trim-buttons {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .trim-btn {
             background: #16213e;
             color: white;
             border: 1px solid #4fc3f7;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
             cursor: pointer;
-            min-width: 40px;
+            min-width: 35px;
             transition: all 0.3s ease;
         }
 
@@ -308,11 +334,17 @@
         }
 
         .trim-value {
-            font-size: 16px;
+            font-size: 14px;
             color: #fff;
-            min-width: 50px;
+            min-width: 40px;
             text-align: center;
             font-weight: bold;
+        }
+
+        .trim-label {
+            color: #4fc3f7;
+            font-size: 12px;
+            min-width: 70px;
         }
 
         .settings-buttons {
@@ -430,6 +462,16 @@
                 font-size: 14px;
                 padding: 10px 16px;
             }
+
+            .stick-value {
+                font-size: 10px;
+                padding: 3px 6px;
+                min-height: 45px;
+            }
+
+            .settings-modal {
+                padding: 20px;
+            }
         }
 
         @media (orientation: landscape) and (max-height: 600px) {
@@ -463,6 +505,12 @@
                 padding: 8px 16px;
                 font-size: 14px;
             }
+
+            .stick-value {
+                font-size: 9px;
+                padding: 2px 4px;
+                min-height: 35px;
+            }
         }
     </style>
 </head>
@@ -470,7 +518,7 @@
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>🎮 RC プロポコントローラー</h1>
+            <h1>🎮 RC プロポコントローラー (4サーボ対応)</h1>
             <button id="settingsBtn" class="settings-btn">⚙️ 設定</button>
         </div>
 
@@ -495,26 +543,48 @@
                     <input type="text" id="settingsObnizId" class="setting-input" placeholder="例: 1234-5678">
                 </div>
 
-                <div class="setting-group">
-                    <label class="setting-label">🎯 ステアリング トリム</label>
+                <!-- 左ジョイスティック トリム設定 -->
+                <div class="trim-section">
+                    <div class="trim-section-title">🕹️ 左ジョイスティック トリム</div>
+                    
                     <div class="trim-control">
-                        <span style="color: #4fc3f7;">左 ← → 右</span>
+                        <div class="trim-label">上下 (Ch3)</div>
                         <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('steer', -1)">◀</button>
-                            <div class="trim-value" id="settingsSteerTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('steer', 1)">▶</button>
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', -1)">◀</button>
+                            <div class="trim-value" id="settingsLeftYTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', 1)">▶</button>
+                        </div>
+                    </div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">左右 (Ch4)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', -1)">◀</button>
+                            <div class="trim-value" id="settingsLeftXTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', 1)">▶</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="setting-group">
-                    <label class="setting-label">⚡ スロットル トリム</label>
+                <!-- 右ジョイスティック トリム設定 -->
+                <div class="trim-section">
+                    <div class="trim-section-title">🕹️ 右ジョイスティック トリム</div>
+                    
                     <div class="trim-control">
-                        <span style="color: #4fc3f7;">後進 ← → 前進</span>
+                        <div class="trim-label">上下 (Ch1)</div>
                         <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('throttle', -1)">◀</button>
-                            <div class="trim-value" id="settingsThrottleTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('throttle', 1)">▶</button>
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', -1)">◀</button>
+                            <div class="trim-value" id="settingsRightYTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', 1)">▶</button>
+                        </div>
+                    </div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">左右 (Ch2)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', -1)">◀</button>
+                            <div class="trim-value" id="settingsRightXTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', 1)">▶</button>
                         </div>
                     </div>
                 </div>
@@ -525,42 +595,37 @@
                 </div>
 
                 <div class="gpio-info">
-                    <h4>🔌 補足：GPIO接続図</h4>
+                    <h4>🔌 GPIO接続図 (4サーボ構成)</h4>
                     <table class="gpio-table">
                         <tr>
                             <th>Pin</th>
+                            <th>チャンネル</th>
                             <th>機能</th>
                             <th>接続先</th>
                         </tr>
                         <tr>
-                            <td>0</td>
-                            <td>ステア信号</td>
-                            <td>角度サーボ 信号線（黄/橙）</td>
+                            <td>0-2</td>
+                            <td>Ch1</td>
+                            <td>右上下</td>
+                            <td>サーボ1 (信号/電源/GND)</td>
                         </tr>
                         <tr>
-                            <td>1</td>
-                            <td>ステア電源</td>
-                            <td>角度サーボ 電源線（赤）</td>
+                            <td>3-5</td>
+                            <td>Ch2</td>
+                            <td>右左右</td>
+                            <td>サーボ2 (信号/電源/GND)</td>
                         </tr>
                         <tr>
-                            <td>2</td>
-                            <td>ステアGND</td>
-                            <td>角度サーボ GND線（黒/茶）</td>
+                            <td>6-8</td>
+                            <td>Ch3</td>
+                            <td>左上下</td>
+                            <td>サーボ3 (信号/電源/GND)</td>
                         </tr>
                         <tr>
-                            <td>3</td>
-                            <td>駆動信号</td>
-                            <td>ローテーションサーボ 信号線（黄/橙）</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>駆動電源</td>
-                            <td>ローテーションサーボ 電源線（赤）</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>駆動GND</td>
-                            <td>ローテーションサーボ GND線（黒/茶）</td>
+                            <td>9-11</td>
+                            <td>Ch4</td>
+                            <td>左左右</td>
+                            <td>サーボ4 (信号/電源/GND)</td>
                         </tr>
                     </table>
                 </div>
@@ -570,20 +635,20 @@
         <div id="controllerArea" class="controller-area">
             <div class="sticks-container">
                 <div class="stick-section">
-                    <div class="stick-label">🎯 ステアリング (Ch1)</div>
-                    <div id="steerStick" class="stick-container"></div>
+                    <div class="stick-label">🕹️ 左ジョイスティック (Ch3/Ch4)</div>
+                    <div id="leftStick" class="stick-container"></div>
                     <div class="stick-value">
-                        <div>角度: <span id="steerAngle">90°</span></div>
-                        <div>PWM: <span id="steerPwm">1.5ms</span></div>
+                        <div class="axis-info">上下: <span id="leftYAngle">90°</span> (<span id="leftYPwm">1.5ms</span>)</div>
+                        <div class="axis-info">左右: <span id="leftXAngle">90°</span> (<span id="leftXPwm">1.5ms</span>)</div>
                     </div>
                 </div>
 
                 <div class="stick-section">
-                    <div class="stick-label">⚡ スロットル (Ch2)</div>
-                    <div id="throttleStick" class="stick-container"></div>
+                    <div class="stick-label">🕹️ 右ジョイスティック (Ch1/Ch2)</div>
+                    <div id="rightStick" class="stick-container"></div>
                     <div class="stick-value">
-                        <div>速度: <span id="throttleSpeed">停止</span></div>
-                        <div>PWM: <span id="throttlePwm">1.5ms</span></div>
+                        <div class="axis-info">上下: <span id="rightYAngle">90°</span> (<span id="rightYPwm">1.5ms</span>)</div>
+                        <div class="axis-info">左右: <span id="rightXAngle">90°</span> (<span id="rightXPwm">1.5ms</span>)</div>
                     </div>
                 </div>
             </div>
@@ -597,26 +662,44 @@
     <script>
         // グローバル変数
         let obniz = null;
-        let steerServo = null;
-        let driveServo = null;
-        let steerManager = null;
-        let throttleManager = null;
+        let servos = {
+            rightY: null,  // Ch1: Pin 0-2 (右ジョイスティック上下)
+            rightX: null,  // Ch2: Pin 3-5 (右ジョイスティック左右)
+            leftY: null,   // Ch3: Pin 6-8 (左ジョイスティック上下)
+            leftX: null    // Ch4: Pin 9-11 (左ジョイスティック左右)
+        };
+        let stickManagers = {
+            left: null,
+            right: null
+        };
 
         // RC設定
         const RC_CONFIG = {
             frequency: 50,
-            steerPin: 0,
-            drivePin: 3,
-            steerTrim: 0,
-            throttleTrim: 0
+            pins: {
+                rightY: { signal: 0, vcc: 1, gnd: 2 },  // Ch1
+                rightX: { signal: 3, vcc: 4, gnd: 5 },  // Ch2
+                leftY: { signal: 6, vcc: 7, gnd: 8 },   // Ch3
+                leftX: { signal: 9, vcc: 10, gnd: 11 }  // Ch4
+            },
+            trims: {
+                rightY: 0,
+                rightX: 0,
+                leftY: 0,
+                leftX: 0
+            }
         };
 
         // 設定管理
-        const SETTINGS_KEY = 'rcPropoSettings';
+        const SETTINGS_KEY = 'rcPropoSettings4Servo';
 
         // 現在の値
-        let currentSteer = 0;
-        let currentThrottle = 0;
+        let currentValues = {
+            rightY: 0,
+            rightX: 0,
+            leftY: 0,
+            leftX: 0
+        };
 
         // PWM計算 (1.0ms～2.0ms)
         function calculatePWM(value, trim = 0) {
@@ -625,21 +708,10 @@
             return 1.0 + (adjustedValue + 1.0) * 0.5;
         }
 
-        // ステア角度計算
-        function calculateSteerAngle(x, trim = 0) {
+        // サーボ角度計算
+        function calculateServoAngle(value, trim = 0) {
             const trimOffset = trim * 2;
-            return Math.round(90 + (x * 90) + trimOffset);
-        }
-
-        // スロットル状態
-        function getThrottleDescription(y) {
-            if (Math.abs(y) < 0.05) return "停止";
-            if (y > 0.7) return "フル前進";
-            if (y > 0.3) return "中速前進";
-            if (y > 0.05) return "低速前進";
-            if (y < -0.7) return "フル後進";
-            if (y < -0.3) return "中速後進";
-            return "低速後進";
+            return Math.round(90 + (value * 90) + trimOffset);
         }
 
         // 設定の読み込み
@@ -647,8 +719,10 @@
             const saved = localStorage.getItem(SETTINGS_KEY);
             if (saved) {
                 const settings = JSON.parse(saved);
-                RC_CONFIG.steerTrim = settings.steerTrim || 0;
-                RC_CONFIG.throttleTrim = settings.throttleTrim || 0;
+                RC_CONFIG.trims.rightY = settings.rightYTrim || 0;
+                RC_CONFIG.trims.rightX = settings.rightXTrim || 0;
+                RC_CONFIG.trims.leftY = settings.leftYTrim || 0;
+                RC_CONFIG.trims.leftX = settings.leftXTrim || 0;
                 return settings;
             }
             return null;
@@ -658,8 +732,10 @@
         function saveSettings(obnizId) {
             const settings = {
                 obnizId: obnizId,
-                steerTrim: RC_CONFIG.steerTrim,
-                throttleTrim: RC_CONFIG.throttleTrim
+                rightYTrim: RC_CONFIG.trims.rightY,
+                rightXTrim: RC_CONFIG.trims.rightX,
+                leftYTrim: RC_CONFIG.trims.leftY,
+                leftXTrim: RC_CONFIG.trims.leftX
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         }
@@ -675,8 +751,11 @@
                 obnizInput.value = saved.obnizId;
             }
 
-            document.getElementById('settingsSteerTrim').textContent = RC_CONFIG.steerTrim;
-            document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
+            // トリム値を設定画面に反映
+            document.getElementById('settingsRightYTrim').textContent = RC_CONFIG.trims.rightY;
+            document.getElementById('settingsRightXTrim').textContent = RC_CONFIG.trims.rightX;
+            document.getElementById('settingsLeftYTrim').textContent = RC_CONFIG.trims.leftY;
+            document.getElementById('settingsLeftXTrim').textContent = RC_CONFIG.trims.leftX;
 
             firstTimeMsg.style.display = isFirstTime ? 'block' : 'none';
             overlay.classList.add('active');
@@ -688,16 +767,20 @@
         }
 
         // 設定画面のトリム調整
-        function adjustSettingTrim(type, direction) {
-            if (type === 'steer') {
-                RC_CONFIG.steerTrim = Math.max(-10, Math.min(10, RC_CONFIG.steerTrim + direction));
-                document.getElementById('settingsSteerTrim').textContent = RC_CONFIG.steerTrim;
-            } else {
-                RC_CONFIG.throttleTrim = Math.max(-10, Math.min(10, RC_CONFIG.throttleTrim + direction));
-                document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
-            }
+        function adjustSettingTrim(axis, direction) {
+            RC_CONFIG.trims[axis] = Math.max(-10, Math.min(10, RC_CONFIG.trims[axis] + direction));
+            
+            const trimElementMap = {
+                rightY: 'settingsRightYTrim',
+                rightX: 'settingsRightXTrim',
+                leftY: 'settingsLeftYTrim',
+                leftX: 'settingsLeftXTrim'
+            };
+            
+            document.getElementById(trimElementMap[axis]).textContent = RC_CONFIG.trims[axis];
 
-            if (steerServo && driveServo) {
+            // 接続中であればサーボを更新
+            if (servos.rightY && servos.rightX && servos.leftY && servos.leftX) {
                 updateServos();
             }
         }
@@ -721,20 +804,27 @@
                 obniz.onconnect = async () => {
                     console.log('RC プロポ接続成功');
 
-                    obniz.io1.output(true);
-                    obniz.io2.output(false);
-                    obniz.io4.output(true);
-                    obniz.io5.output(false);
+                    // 各サーボの電源設定
+                    obniz.io1.output(true);   // Ch1 VCC
+                    obniz.io2.output(false);  // Ch1 GND
+                    obniz.io4.output(true);   // Ch2 VCC
+                    obniz.io5.output(false);  // Ch2 GND
+                    obniz.io7.output(true);   // Ch3 VCC
+                    obniz.io8.output(false);  // Ch3 GND
+                    obniz.io10.output(true);  // Ch4 VCC
+                    obniz.io11.output(false); // Ch4 GND
 
-                    steerServo = obniz.wired("ServoMotor", {
-                        signal: RC_CONFIG.steerPin, vcc: 1, gnd: 2
-                    });
-                    driveServo = obniz.wired("ServoMotor", {
-                        signal: RC_CONFIG.drivePin, vcc: 4, gnd: 5
-                    });
+                    // サーボ初期化
+                    servos.rightY = obniz.wired("ServoMotor", RC_CONFIG.pins.rightY);
+                    servos.rightX = obniz.wired("ServoMotor", RC_CONFIG.pins.rightX);
+                    servos.leftY = obniz.wired("ServoMotor", RC_CONFIG.pins.leftY);
+                    servos.leftX = obniz.wired("ServoMotor", RC_CONFIG.pins.leftX);
 
-                    steerServo.angle(90);
-                    driveServo.angle(90);
+                    // 全サーボを中央位置に設定
+                    servos.rightY.angle(90);
+                    servos.rightX.angle(90);
+                    servos.leftY.angle(90);
+                    servos.leftX.angle(90);
 
                     document.getElementById('status').textContent = '接続済み';
                     document.getElementById('status').className = 'status-indicator connected';
@@ -760,8 +850,8 @@
         // 切断
         function disconnectObniz() {
             if (obniz) obniz.close();
-            if (steerManager) steerManager.destroy();
-            if (throttleManager) throttleManager.destroy();
+            if (stickManagers.left) stickManagers.left.destroy();
+            if (stickManagers.right) stickManagers.right.destroy();
             resetConnection();
         }
 
@@ -774,10 +864,20 @@
             document.getElementById('disconnectBtn').style.display = 'none';
             document.getElementById('controllerArea').classList.remove('active');
 
-            steerManager = null;
-            throttleManager = null;
-            currentSteer = 0;
-            currentThrottle = 0;
+            stickManagers.left = null;
+            stickManagers.right = null;
+            
+            // サーボオブジェクトをリセット
+            servos.rightY = null;
+            servos.rightX = null;
+            servos.leftY = null;
+            servos.leftX = null;
+            
+            // 現在値をリセット
+            currentValues.rightY = 0;
+            currentValues.rightX = 0;
+            currentValues.leftY = 0;
+            currentValues.leftX = 0;
 
             updateDisplay();
         }
@@ -799,54 +899,58 @@
                 lockY: false
             };
 
-            if (steerManager) {
-                steerManager.destroy();
-                steerManager = null;
+            // 既存のスティックマネージャーを破棄
+            if (stickManagers.left) {
+                stickManagers.left.destroy();
+                stickManagers.left = null;
             }
-            if (throttleManager) {
-                throttleManager.destroy();
-                throttleManager = null;
+            if (stickManagers.right) {
+                stickManagers.right.destroy();
+                stickManagers.right = null;
             }
 
-            const steerZone = document.getElementById('steerStick');
-            const throttleZone = document.getElementById('throttleStick');
+            const leftZone = document.getElementById('leftStick');
+            const rightZone = document.getElementById('rightStick');
 
-            steerManager = nipplejs.create({
-                zone: steerZone,
+            // 左ジョイスティック作成
+            stickManagers.left = nipplejs.create({
+                zone: leftZone,
                 ...stickOptions
             });
 
-            throttleManager = nipplejs.create({
-                zone: throttleZone,
+            // 右ジョイスティック作成
+            stickManagers.right = nipplejs.create({
+                zone: rightZone,
                 ...stickOptions
             });
 
-            // ステアリングイベント
-            steerManager.on('move', (evt, data) => {
+            // 左ジョイスティックイベント
+            stickManagers.left.on('move', (evt, data) => {
                 if (data.vector) {
-                    const newSteer = Math.max(-1, Math.min(1, data.vector.x));
-                    currentSteer = newSteer;
+                    currentValues.leftX = Math.max(-1, Math.min(1, data.vector.x));
+                    currentValues.leftY = Math.max(-1, Math.min(1, -data.vector.y)); // Y軸反転
                     updateServos();
                 }
             });
 
-            steerManager.on('end', (evt, data) => {
-                currentSteer = 0;
+            stickManagers.left.on('end', (evt, data) => {
+                currentValues.leftX = 0;
+                currentValues.leftY = 0;
                 updateServos();
             });
 
-            // スロットルイベント
-            throttleManager.on('move', (evt, data) => {
+            // 右ジョイスティックイベント
+            stickManagers.right.on('move', (evt, data) => {
                 if (data.vector) {
-                    const rawThrottle = -data.vector.y;
-                    const newThrottle = Math.max(-1, Math.min(1, rawThrottle));
-                    currentThrottle = newThrottle;
+                    currentValues.rightX = Math.max(-1, Math.min(1, data.vector.x));
+                    currentValues.rightY = Math.max(-1, Math.min(1, -data.vector.y)); // Y軸反転
                     updateServos();
                 }
             });
 
-            throttleManager.on('end', (evt, data) => {
-                currentThrottle = 0;
+            stickManagers.right.on('end', (evt, data) => {
+                currentValues.rightX = 0;
+                currentValues.rightY = 0;
                 updateServos();
             });
 
@@ -855,14 +959,20 @@
 
         // サーボ制御
         function updateServos() {
-            if (!steerServo || !driveServo) return;
+            if (!servos.rightY || !servos.rightX || !servos.leftY || !servos.leftX) return;
 
             try {
-                const steerAngle = calculateSteerAngle(currentSteer, RC_CONFIG.steerTrim);
-                const throttleAngle = 90 + ((currentThrottle + RC_CONFIG.throttleTrim * 0.1) * 90);
+                // 各軸の角度計算（トリム適用）
+                const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY);
+                const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX);
+                const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY);
+                const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX);
 
-                steerServo.angle(Math.max(0, Math.min(180, steerAngle)));
-                driveServo.angle(Math.max(0, Math.min(180, throttleAngle)));
+                // サーボ角度設定（0-180度の範囲でクランプ）
+                servos.rightY.angle(Math.max(0, Math.min(180, rightYAngle)));
+                servos.rightX.angle(Math.max(0, Math.min(180, rightXAngle)));
+                servos.leftY.angle(Math.max(0, Math.min(180, leftYAngle)));
+                servos.leftX.angle(Math.max(0, Math.min(180, leftXAngle)));
 
                 updateDisplay();
 
@@ -873,26 +983,48 @@
 
         // 表示更新
         function updateDisplay() {
-            const steerPwm = calculatePWM(currentSteer, RC_CONFIG.steerTrim * 0.1);
-            const throttlePwm = calculatePWM(currentThrottle, RC_CONFIG.throttleTrim * 0.1);
-            const steerAngle = calculateSteerAngle(currentSteer, RC_CONFIG.steerTrim);
+            // PWM値とサーボ角度の計算
+            const rightYPwm = calculatePWM(currentValues.rightY, RC_CONFIG.trims.rightY * 0.1);
+            const rightXPwm = calculatePWM(currentValues.rightX, RC_CONFIG.trims.rightX * 0.1);
+            const leftYPwm = calculatePWM(currentValues.leftY, RC_CONFIG.trims.leftY * 0.1);
+            const leftXPwm = calculatePWM(currentValues.leftX, RC_CONFIG.trims.leftX * 0.1);
 
-            document.getElementById('steerAngle').textContent = steerAngle + '°';
-            document.getElementById('steerPwm').textContent = steerPwm.toFixed(2) + 'ms';
-            document.getElementById('throttleSpeed').textContent = getThrottleDescription(currentThrottle);
-            document.getElementById('throttlePwm').textContent = throttlePwm.toFixed(2) + 'ms';
+            const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY);
+            const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX);
+            const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY);
+            const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX);
+
+            // 右ジョイスティック表示更新
+            document.getElementById('rightYAngle').textContent = rightYAngle + '°';
+            document.getElementById('rightYPwm').textContent = rightYPwm.toFixed(2) + 'ms';
+            document.getElementById('rightXAngle').textContent = rightXAngle + '°';
+            document.getElementById('rightXPwm').textContent = rightXPwm.toFixed(2) + 'ms';
+
+            // 左ジョイスティック表示更新
+            document.getElementById('leftYAngle').textContent = leftYAngle + '°';
+            document.getElementById('leftYPwm').textContent = leftYPwm.toFixed(2) + 'ms';
+            document.getElementById('leftXAngle').textContent = leftXAngle + '°';
+            document.getElementById('leftXPwm').textContent = leftXPwm.toFixed(2) + 'ms';
         }
 
         // 緊急停止
         function emergencyStop() {
-            if (steerServo && driveServo) {
-                steerServo.angle(90);
-                driveServo.angle(90);
-                currentSteer = 0;
-                currentThrottle = 0;
+            if (servos.rightY && servos.rightX && servos.leftY && servos.leftX) {
+                // 全サーボを中央位置に戻す
+                servos.rightY.angle(90);
+                servos.rightX.angle(90);
+                servos.leftY.angle(90);
+                servos.leftX.angle(90);
+                
+                // 現在値をリセット
+                currentValues.rightY = 0;
+                currentValues.rightX = 0;
+                currentValues.leftY = 0;
+                currentValues.leftX = 0;
 
-                if (steerManager) steerManager.destroy();
-                if (throttleManager) throttleManager.destroy();
+                // スティックを再初期化
+                if (stickManagers.left) stickManagers.left.destroy();
+                if (stickManagers.right) stickManagers.right.destroy();
                 initSticks();
 
                 updateDisplay();
@@ -928,17 +1060,24 @@
                 return;
             }
 
-            RC_CONFIG.steerTrim = saved.steerTrim || 0;
-            RC_CONFIG.throttleTrim = saved.throttleTrim || 0;
-            document.getElementById('settingsSteerTrim').textContent = RC_CONFIG.steerTrim;
-            document.getElementById('settingsThrottleTrim').textContent = RC_CONFIG.throttleTrim;
+            // 保存されたトリム値に戻す
+            RC_CONFIG.trims.rightY = saved.rightYTrim || 0;
+            RC_CONFIG.trims.rightX = saved.rightXTrim || 0;
+            RC_CONFIG.trims.leftY = saved.leftYTrim || 0;
+            RC_CONFIG.trims.leftX = saved.leftXTrim || 0;
+            
+            // 設定画面の表示も元に戻す
+            document.getElementById('settingsRightYTrim').textContent = RC_CONFIG.trims.rightY;
+            document.getElementById('settingsRightXTrim').textContent = RC_CONFIG.trims.rightX;
+            document.getElementById('settingsLeftYTrim').textContent = RC_CONFIG.trims.leftY;
+            document.getElementById('settingsLeftXTrim').textContent = RC_CONFIG.trims.leftX;
 
             hideSettings();
         });
 
         // 初期化
         window.addEventListener('load', () => {
-            console.log('RC プロポコントローラー初期化開始');
+            console.log('RC プロポコントローラー (4サーボ対応) 初期化開始');
 
             const saved = loadSettings();
             updateDisplay();
@@ -947,7 +1086,7 @@
                 setTimeout(() => showSettings(true), 500);
             }
 
-            console.log('RC プロポコントローラー初期化完了');
+            console.log('RC プロポコントローラー (4サーボ対応) 初期化完了');
         });
     </script>
 </body>
