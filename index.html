@@ -554,6 +554,10 @@
                             <div class="trim-value" id="settingsLeftYTrim">0</div>
                             <button class="trim-btn" onclick="adjustSettingTrim('leftY', 1)">▶</button>
                         </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsLeftYReverse" onchange="toggleReverse('leftY')" style="margin-right: 5px;">
+                            反転
+                        </label>
                     </div>
                     
                     <div class="trim-control">
@@ -563,6 +567,10 @@
                             <div class="trim-value" id="settingsLeftXTrim">0</div>
                             <button class="trim-btn" onclick="adjustSettingTrim('leftX', 1)">▶</button>
                         </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsLeftXReverse" onchange="toggleReverse('leftX')" style="margin-right: 5px;">
+                            反転
+                        </label>
                     </div>
                 </div>
 
@@ -577,6 +585,10 @@
                             <div class="trim-value" id="settingsRightYTrim">0</div>
                             <button class="trim-btn" onclick="adjustSettingTrim('rightY', 1)">▶</button>
                         </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsRightYReverse" onchange="toggleReverse('rightY')" style="margin-right: 5px;">
+                            反転
+                        </label>
                     </div>
                     
                     <div class="trim-control">
@@ -586,6 +598,10 @@
                             <div class="trim-value" id="settingsRightXTrim">0</div>
                             <button class="trim-btn" onclick="adjustSettingTrim('rightX', 1)">▶</button>
                         </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsRightXReverse" onchange="toggleReverse('rightX')" style="margin-right: 5px;">
+                            反転
+                        </label>
                     </div>
                 </div>
 
@@ -687,6 +703,12 @@
                 rightX: 0,
                 leftY: 0,
                 leftX: 0
+            },
+            reverse: {
+                rightY: false,
+                rightX: false,
+                leftY: false,
+                leftX: false
             }
         };
 
@@ -702,16 +724,18 @@
         };
 
         // PWM計算 (1.0ms～2.0ms)
-        function calculatePWM(value, trim = 0) {
+        function calculatePWM(value, trim = 0, reverse = false) {
+            const reversedValue = reverse ? -value : value;
             const trimOffset = trim * 0.01;
-            const adjustedValue = Math.max(-1, Math.min(1, value + trimOffset));
+            const adjustedValue = Math.max(-1, Math.min(1, reversedValue + trimOffset));
             return 1.0 + (adjustedValue + 1.0) * 0.5;
         }
 
         // サーボ角度計算
-        function calculateServoAngle(value, trim = 0) {
+        function calculateServoAngle(value, trim = 0, reverse = false) {
+            const reversedValue = reverse ? -value : value;
             const trimOffset = trim * 2;
-            return Math.round(90 + (value * 90) + trimOffset);
+            return Math.round(90 + (reversedValue * 90) + trimOffset);
         }
 
         // 設定の読み込み
@@ -723,6 +747,10 @@
                 RC_CONFIG.trims.rightX = settings.rightXTrim || 0;
                 RC_CONFIG.trims.leftY = settings.leftYTrim || 0;
                 RC_CONFIG.trims.leftX = settings.leftXTrim || 0;
+                RC_CONFIG.reverse.rightY = settings.rightYReverse || false;
+                RC_CONFIG.reverse.rightX = settings.rightXReverse || false;
+                RC_CONFIG.reverse.leftY = settings.leftYReverse || false;
+                RC_CONFIG.reverse.leftX = settings.leftXReverse || false;
                 return settings;
             }
             return null;
@@ -735,7 +763,11 @@
                 rightYTrim: RC_CONFIG.trims.rightY,
                 rightXTrim: RC_CONFIG.trims.rightX,
                 leftYTrim: RC_CONFIG.trims.leftY,
-                leftXTrim: RC_CONFIG.trims.leftX
+                leftXTrim: RC_CONFIG.trims.leftX,
+                rightYReverse: RC_CONFIG.reverse.rightY,
+                rightXReverse: RC_CONFIG.reverse.rightX,
+                leftYReverse: RC_CONFIG.reverse.leftY,
+                leftXReverse: RC_CONFIG.reverse.leftX
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         }
@@ -756,6 +788,12 @@
             document.getElementById('settingsRightXTrim').textContent = RC_CONFIG.trims.rightX;
             document.getElementById('settingsLeftYTrim').textContent = RC_CONFIG.trims.leftY;
             document.getElementById('settingsLeftXTrim').textContent = RC_CONFIG.trims.leftX;
+
+            // 反転設定を反映
+            document.getElementById('settingsRightYReverse').checked = RC_CONFIG.reverse.rightY;
+            document.getElementById('settingsRightXReverse').checked = RC_CONFIG.reverse.rightX;
+            document.getElementById('settingsLeftYReverse').checked = RC_CONFIG.reverse.leftY;
+            document.getElementById('settingsLeftXReverse').checked = RC_CONFIG.reverse.leftX;
 
             firstTimeMsg.style.display = isFirstTime ? 'block' : 'none';
             overlay.classList.add('active');
@@ -779,6 +817,16 @@
             
             document.getElementById(trimElementMap[axis]).textContent = RC_CONFIG.trims[axis];
 
+            // 接続中であればサーボを更新
+            if (servos.rightY && servos.rightX && servos.leftY && servos.leftX) {
+                updateServos();
+            }
+        }
+
+        // 反転設定の変更
+        function toggleReverse(axis) {
+            RC_CONFIG.reverse[axis] = !RC_CONFIG.reverse[axis];
+            
             // 接続中であればサーボを更新
             if (servos.rightY && servos.rightX && servos.leftY && servos.leftX) {
                 updateServos();
@@ -962,11 +1010,11 @@
             if (!servos.rightY || !servos.rightX || !servos.leftY || !servos.leftX) return;
 
             try {
-                // 各軸の角度計算（トリム適用）
-                const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY);
-                const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX);
-                const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY);
-                const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX);
+                // 各軸の角度計算（トリムと反転適用）
+                const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY, RC_CONFIG.reverse.rightY);
+                const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX, RC_CONFIG.reverse.rightX);
+                const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY, RC_CONFIG.reverse.leftY);
+                const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX, RC_CONFIG.reverse.leftX);
 
                 // サーボ角度設定（0-180度の範囲でクランプ）
                 servos.rightY.angle(Math.max(0, Math.min(180, rightYAngle)));
@@ -983,16 +1031,16 @@
 
         // 表示更新
         function updateDisplay() {
-            // PWM値とサーボ角度の計算
-            const rightYPwm = calculatePWM(currentValues.rightY, RC_CONFIG.trims.rightY * 0.1);
-            const rightXPwm = calculatePWM(currentValues.rightX, RC_CONFIG.trims.rightX * 0.1);
-            const leftYPwm = calculatePWM(currentValues.leftY, RC_CONFIG.trims.leftY * 0.1);
-            const leftXPwm = calculatePWM(currentValues.leftX, RC_CONFIG.trims.leftX * 0.1);
+            // PWM値とサーボ角度の計算（反転適用）
+            const rightYPwm = calculatePWM(currentValues.rightY, RC_CONFIG.trims.rightY * 0.1, RC_CONFIG.reverse.rightY);
+            const rightXPwm = calculatePWM(currentValues.rightX, RC_CONFIG.trims.rightX * 0.1, RC_CONFIG.reverse.rightX);
+            const leftYPwm = calculatePWM(currentValues.leftY, RC_CONFIG.trims.leftY * 0.1, RC_CONFIG.reverse.leftY);
+            const leftXPwm = calculatePWM(currentValues.leftX, RC_CONFIG.trims.leftX * 0.1, RC_CONFIG.reverse.leftX);
 
-            const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY);
-            const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX);
-            const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY);
-            const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX);
+            const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY, RC_CONFIG.reverse.rightY);
+            const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX, RC_CONFIG.reverse.rightX);
+            const leftYAngle = calculateServoAngle(currentValues.leftY, RC_CONFIG.trims.leftY, RC_CONFIG.reverse.leftY);
+            const leftXAngle = calculateServoAngle(currentValues.leftX, RC_CONFIG.trims.leftX, RC_CONFIG.reverse.leftX);
 
             // 右ジョイスティック表示更新
             document.getElementById('rightYAngle').textContent = rightYAngle + '°';
@@ -1066,11 +1114,22 @@
             RC_CONFIG.trims.leftY = saved.leftYTrim || 0;
             RC_CONFIG.trims.leftX = saved.leftXTrim || 0;
             
+            // 保存された反転設定に戻す
+            RC_CONFIG.reverse.rightY = saved.rightYReverse || false;
+            RC_CONFIG.reverse.rightX = saved.rightXReverse || false;
+            RC_CONFIG.reverse.leftY = saved.leftYReverse || false;
+            RC_CONFIG.reverse.leftX = saved.leftXReverse || false;
+            
             // 設定画面の表示も元に戻す
             document.getElementById('settingsRightYTrim').textContent = RC_CONFIG.trims.rightY;
             document.getElementById('settingsRightXTrim').textContent = RC_CONFIG.trims.rightX;
             document.getElementById('settingsLeftYTrim').textContent = RC_CONFIG.trims.leftY;
             document.getElementById('settingsLeftXTrim').textContent = RC_CONFIG.trims.leftX;
+            
+            document.getElementById('settingsRightYReverse').checked = RC_CONFIG.reverse.rightY;
+            document.getElementById('settingsRightXReverse').checked = RC_CONFIG.reverse.rightX;
+            document.getElementById('settingsLeftYReverse').checked = RC_CONFIG.reverse.leftY;
+            document.getElementById('settingsLeftXReverse').checked = RC_CONFIG.reverse.leftX;
 
             hideSettings();
         });
