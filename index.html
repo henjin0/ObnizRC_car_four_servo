@@ -8,7 +8,217 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://unpkg.com/obniz/obniz.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
-    <style>
+    <link rel="stylesheet" href="#styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🎮 RC プロポコントローラー (4サーボ対応)</h1>
+            <button id="settingsBtn" class="settings-btn">⚙️ 設定</button>
+        </div>
+
+        <div class="connection-bar">
+            <button id="connectBtn" class="connect-disconnect-btn">接続</button>
+            <button id="disconnectBtn" class="connect-disconnect-btn disconnect" style="display: none;">切断</button>
+            <div id="status" class="status-indicator disconnected">未接続</div>
+        </div>
+
+        <!-- 設定ポップアップ -->
+        <div id="settingsOverlay" class="settings-overlay">
+            <div class="settings-modal">
+                <div class="settings-title">⚙️ 設定</div>
+
+                <div id="firstTimeMessage" class="first-time-message" style="display: none;">
+                    <strong>🎮 初回セットアップ</strong><br>
+                    まずはObniz IDを設定してコントローラーを使い始めましょう！
+                </div>
+
+                <div class="setting-group">
+                    <label class="setting-label">🔗 Obniz ID</label>
+                    <input type="text" id="settingsObnizId" class="setting-input" placeholder="例: 1234-5678">
+                </div>
+
+                <!-- サーボタイプ設定 -->
+                <div class="servo-type-section">
+                    <div class="servo-type-title">🔧 サーボタイプ設定</div>
+                    
+                    <div class="servo-type-control">
+                        <div class="servo-type-label">Ch1 (右上下)</div>
+                        <select id="ch1ServoType" class="servo-type-select">
+                            <option value="SG90">SG90 (0.5~2.4ms)</option>
+                            <option value="ESC">1$ ESC (1.0~2.0ms)</option>
+                            <option value="GS1B">GS1B (0.6~2.4ms)</option>
+                            <option value="GS2B">GS2B (0.5~2.5ms)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="servo-type-control">
+                        <div class="servo-type-label">Ch2 (右左右)</div>
+                        <select id="ch2ServoType" class="servo-type-select">
+                            <option value="SG90">SG90 (0.5~2.4ms)</option>
+                            <option value="ESC">1$ ESC (1.0~2.0ms)</option>
+                            <option value="GS1B">GS1B (0.6~2.4ms)</option>
+                            <option value="GS2B">GS2B (0.5~2.5ms)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="servo-type-control">
+                        <div class="servo-type-label">Ch3 (左上下)</div>
+                        <select id="ch3ServoType" class="servo-type-select">
+                            <option value="SG90">SG90 (0.5~2.4ms)</option>
+                            <option value="ESC">1$ ESC (1.0~2.0ms)</option>
+                            <option value="GS1B">GS1B (0.6~2.4ms)</option>
+                            <option value="GS2B">GS2B (0.5~2.5ms)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="servo-type-control">
+                        <div class="servo-type-label">Ch4 (左左右)</div>
+                        <select id="ch4ServoType" class="servo-type-select">
+                            <option value="SG90">SG90 (0.5~2.4ms)</option>
+                            <option value="ESC">1$ ESC (1.0~2.0ms)</option>
+                            <option value="GS1B">GS1B (0.6~2.4ms)</option>
+                            <option value="GS2B">GS2B (0.5~2.5ms)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 左ジョイスティック トリム設定 -->
+                <div class="trim-section">
+                    <div class="trim-section-title">🕹️ 左ジョイスティック トリム</div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">上下 (Ch3)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', -1)">◀</button>
+                            <div class="trim-value" id="settingsLeftYTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', 1)">▶</button>
+                        </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsLeftYReverse" onchange="toggleReverse('leftY')" style="margin-right: 5px;">
+                            反転
+                        </label>
+                    </div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">左右 (Ch4)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', -1)">◀</button>
+                            <div class="trim-value" id="settingsLeftXTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', 1)">▶</button>
+                        </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsLeftXReverse" onchange="toggleReverse('leftX')" style="margin-right: 5px;">
+                            反転
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 右ジョイスティック トリム設定 -->
+                <div class="trim-section">
+                    <div class="trim-section-title">🕹️ 右ジョイスティック トリム</div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">上下 (Ch1)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', -1)">◀</button>
+                            <div class="trim-value" id="settingsRightYTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', 1)">▶</button>
+                        </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsRightYReverse" onchange="toggleReverse('rightY')" style="margin-right: 5px;">
+                            反転
+                        </label>
+                    </div>
+                    
+                    <div class="trim-control">
+                        <div class="trim-label">左右 (Ch2)</div>
+                        <div class="trim-buttons">
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', -1)">◀</button>
+                            <div class="trim-value" id="settingsRightXTrim">0</div>
+                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', 1)">▶</button>
+                        </div>
+                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
+                            <input type="checkbox" id="settingsRightXReverse" onchange="toggleReverse('rightX')" style="margin-right: 5px;">
+                            反転
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-buttons">
+                    <button id="saveSettings" class="btn-primary">💾 保存</button>
+                    <button id="cancelSettings" class="btn-secondary">❌ キャンセル</button>
+                </div>
+
+                <div class="gpio-info">
+                    <h4>🔌 GPIO接続図 (4サーボ構成)</h4>
+                    <table class="gpio-table">
+                        <tr>
+                            <th>Pin</th>
+                            <th>チャンネル</th>
+                            <th>機能</th>
+                            <th>接続先</th>
+                        </tr>
+                        <tr>
+                            <td>0-2</td>
+                            <td>Ch1</td>
+                            <td>右上下</td>
+                            <td>サーボ1 (信号/電源/GND)</td>
+                        </tr>
+                        <tr>
+                            <td>3-5</td>
+                            <td>Ch2</td>
+                            <td>右左右</td>
+                            <td>サーボ2 (信号/電源/GND)</td>
+                        </tr>
+                        <tr>
+                            <td>6-8</td>
+                            <td>Ch3</td>
+                            <td>左上下</td>
+                            <td>サーボ3 (信号/電源/GND)</td>
+                        </tr>
+                        <tr>
+                            <td>9-11</td>
+                            <td>Ch4</td>
+                            <td>左左右</td>
+                            <td>サーボ4 (信号/電源/GND)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="controllerArea" class="controller-area">
+            <div class="sticks-container">
+                <div class="stick-section">
+                    <div class="stick-label">🕹️ 左ジョイスティック (Ch3/Ch4)</div>
+                    <div id="leftStick" class="stick-container"></div>
+                    <div class="stick-value">
+                        <div class="axis-info">上下: <span id="leftYAngle">90°</span> (<span id="leftYPwm">1.5ms</span>)</div>
+                        <div class="axis-info">左右: <span id="leftXAngle">90°</span> (<span id="leftXPwm">1.5ms</span>)</div>
+                    </div>
+                </div>
+
+                <div class="stick-section">
+                    <div class="stick-label">🕹️ 右ジョイスティック (Ch1/Ch2)</div>
+                    <div id="rightStick" class="stick-container"></div>
+                    <div class="stick-value">
+                        <div class="axis-info">上下: <span id="rightYAngle">90°</span> (<span id="rightYPwm">1.5ms</span>)</div>
+                        <div class="axis-info">左右: <span id="rightXAngle">90°</span> (<span id="rightXPwm">1.5ms</span>)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <button id="emergencyStop" class="emergency-stop">🛑 緊急停止</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="#script.js"></script>
+
+    <style id="styles.css">
         * {
             margin: 0;
             padding: 0;
@@ -279,6 +489,63 @@
             box-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
         }
 
+        /* サーボタイプ設定 */
+        .servo-type-section {
+            background: rgba(15, 20, 25, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #4fc3f7;
+            margin-bottom: 15px;
+        }
+
+        .servo-type-title {
+            color: #4fc3f7;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .servo-type-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15, 20, 25, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #4fc3f7;
+            margin-bottom: 8px;
+        }
+
+        .servo-type-control:last-child {
+            margin-bottom: 0;
+        }
+
+        .servo-type-label {
+            color: #4fc3f7;
+            font-size: 12px;
+            min-width: 80px;
+            font-weight: bold;
+        }
+
+        .servo-type-select {
+            background: rgba(15, 20, 25, 0.8);
+            color: white;
+            border: 1px solid #4fc3f7;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .servo-type-select:focus {
+            outline: none;
+            border-color: #29b6f6;
+            box-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+        }
+
         .trim-section {
             background: rgba(15, 20, 25, 0.5);
             padding: 15px;
@@ -513,169 +780,8 @@
             }
         }
     </style>
-</head>
 
-<body>
-    <div class="app-container">
-        <div class="header">
-            <h1>🎮 RC プロポコントローラー (4サーボ対応)</h1>
-            <button id="settingsBtn" class="settings-btn">⚙️ 設定</button>
-        </div>
-
-        <div class="connection-bar">
-            <button id="connectBtn" class="connect-disconnect-btn">接続</button>
-            <button id="disconnectBtn" class="connect-disconnect-btn disconnect" style="display: none;">切断</button>
-            <div id="status" class="status-indicator disconnected">未接続</div>
-        </div>
-
-        <!-- 設定ポップアップ -->
-        <div id="settingsOverlay" class="settings-overlay">
-            <div class="settings-modal">
-                <div class="settings-title">⚙️ 設定</div>
-
-                <div id="firstTimeMessage" class="first-time-message" style="display: none;">
-                    <strong>🎮 初回セットアップ</strong><br>
-                    まずはObniz IDを設定してコントローラーを使い始めましょう！
-                </div>
-
-                <div class="setting-group">
-                    <label class="setting-label">🔗 Obniz ID</label>
-                    <input type="text" id="settingsObnizId" class="setting-input" placeholder="例: 1234-5678">
-                </div>
-
-                <!-- 左ジョイスティック トリム設定 -->
-                <div class="trim-section">
-                    <div class="trim-section-title">🕹️ 左ジョイスティック トリム</div>
-                    
-                    <div class="trim-control">
-                        <div class="trim-label">上下 (Ch3)</div>
-                        <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', -1)">◀</button>
-                            <div class="trim-value" id="settingsLeftYTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('leftY', 1)">▶</button>
-                        </div>
-                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
-                            <input type="checkbox" id="settingsLeftYReverse" onchange="toggleReverse('leftY')" style="margin-right: 5px;">
-                            反転
-                        </label>
-                    </div>
-                    
-                    <div class="trim-control">
-                        <div class="trim-label">左右 (Ch4)</div>
-                        <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', -1)">◀</button>
-                            <div class="trim-value" id="settingsLeftXTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('leftX', 1)">▶</button>
-                        </div>
-                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
-                            <input type="checkbox" id="settingsLeftXReverse" onchange="toggleReverse('leftX')" style="margin-right: 5px;">
-                            反転
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 右ジョイスティック トリム設定 -->
-                <div class="trim-section">
-                    <div class="trim-section-title">🕹️ 右ジョイスティック トリム</div>
-                    
-                    <div class="trim-control">
-                        <div class="trim-label">上下 (Ch1)</div>
-                        <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', -1)">◀</button>
-                            <div class="trim-value" id="settingsRightYTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('rightY', 1)">▶</button>
-                        </div>
-                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
-                            <input type="checkbox" id="settingsRightYReverse" onchange="toggleReverse('rightY')" style="margin-right: 5px;">
-                            反転
-                        </label>
-                    </div>
-                    
-                    <div class="trim-control">
-                        <div class="trim-label">左右 (Ch2)</div>
-                        <div class="trim-buttons">
-                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', -1)">◀</button>
-                            <div class="trim-value" id="settingsRightXTrim">0</div>
-                            <button class="trim-btn" onclick="adjustSettingTrim('rightX', 1)">▶</button>
-                        </div>
-                        <label style="color: #4fc3f7; font-size: 12px; margin-left: 10px;">
-                            <input type="checkbox" id="settingsRightXReverse" onchange="toggleReverse('rightX')" style="margin-right: 5px;">
-                            反転
-                        </label>
-                    </div>
-                </div>
-
-                <div class="settings-buttons">
-                    <button id="saveSettings" class="btn-primary">💾 保存</button>
-                    <button id="cancelSettings" class="btn-secondary">❌ キャンセル</button>
-                </div>
-
-                <div class="gpio-info">
-                    <h4>🔌 GPIO接続図 (4サーボ構成)</h4>
-                    <table class="gpio-table">
-                        <tr>
-                            <th>Pin</th>
-                            <th>チャンネル</th>
-                            <th>機能</th>
-                            <th>接続先</th>
-                        </tr>
-                        <tr>
-                            <td>0-2</td>
-                            <td>Ch1</td>
-                            <td>右上下</td>
-                            <td>サーボ1 (信号/電源/GND)</td>
-                        </tr>
-                        <tr>
-                            <td>3-5</td>
-                            <td>Ch2</td>
-                            <td>右左右</td>
-                            <td>サーボ2 (信号/電源/GND)</td>
-                        </tr>
-                        <tr>
-                            <td>6-8</td>
-                            <td>Ch3</td>
-                            <td>左上下</td>
-                            <td>サーボ3 (信号/電源/GND)</td>
-                        </tr>
-                        <tr>
-                            <td>9-11</td>
-                            <td>Ch4</td>
-                            <td>左左右</td>
-                            <td>サーボ4 (信号/電源/GND)</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="controllerArea" class="controller-area">
-            <div class="sticks-container">
-                <div class="stick-section">
-                    <div class="stick-label">🕹️ 左ジョイスティック (Ch3/Ch4)</div>
-                    <div id="leftStick" class="stick-container"></div>
-                    <div class="stick-value">
-                        <div class="axis-info">上下: <span id="leftYAngle">90°</span> (<span id="leftYPwm">1.5ms</span>)</div>
-                        <div class="axis-info">左右: <span id="leftXAngle">90°</span> (<span id="leftXPwm">1.5ms</span>)</div>
-                    </div>
-                </div>
-
-                <div class="stick-section">
-                    <div class="stick-label">🕹️ 右ジョイスティック (Ch1/Ch2)</div>
-                    <div id="rightStick" class="stick-container"></div>
-                    <div class="stick-value">
-                        <div class="axis-info">上下: <span id="rightYAngle">90°</span> (<span id="rightYPwm">1.5ms</span>)</div>
-                        <div class="axis-info">左右: <span id="rightXAngle">90°</span> (<span id="rightXPwm">1.5ms</span>)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="control-panel">
-                <button id="emergencyStop" class="emergency-stop">🛑 緊急停止</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+    <script id="script.js">
         // グローバル変数
         let obniz = null;
         let servos = {
@@ -687,6 +793,14 @@
         let stickManagers = {
             left: null,
             right: null
+        };
+
+        // サーボタイプ定義
+        const SERVO_TYPES = {
+            SG90: { min: 0.5, max: 2.4 },
+            ESC: { min: 1.0, max: 2.0 },
+            GS1B: { min: 0.6, max: 2.4 },
+            GS2B: { min: 0.5, max: 2.5 }
         };
 
         // RC設定
@@ -709,6 +823,12 @@
                 rightX: false,
                 leftY: false,
                 leftX: false
+            },
+            servoTypes: {
+                rightY: 'SG90',  // Ch1
+                rightX: 'SG90',  // Ch2
+                leftY: 'SG90',   // Ch3
+                leftX: 'SG90'    // Ch4
             }
         };
 
@@ -723,12 +843,17 @@
             leftX: 0
         };
 
-        // PWM計算 (1.0ms～2.0ms)
-        function calculatePWM(value, trim = 0, reverse = false) {
+        // PWM計算 (サーボタイプに応じた範囲)
+        function calculatePWM(value, trim = 0, reverse = false, servoType = 'SG90') {
             const reversedValue = reverse ? -value : value;
             const trimOffset = trim * 0.01;
             const adjustedValue = Math.max(-1, Math.min(1, reversedValue + trimOffset));
-            return 1.0 + (adjustedValue + 1.0) * 0.5;
+            
+            const range = SERVO_TYPES[servoType];
+            const center = (range.min + range.max) / 2;
+            const halfRange = (range.max - range.min) / 2;
+            
+            return center + (adjustedValue * halfRange);
         }
 
         // サーボ角度計算
@@ -751,6 +876,10 @@
                 RC_CONFIG.reverse.rightX = settings.rightXReverse || false;
                 RC_CONFIG.reverse.leftY = settings.leftYReverse || false;
                 RC_CONFIG.reverse.leftX = settings.leftXReverse || false;
+                RC_CONFIG.servoTypes.rightY = settings.ch1ServoType || 'SG90';
+                RC_CONFIG.servoTypes.rightX = settings.ch2ServoType || 'SG90';
+                RC_CONFIG.servoTypes.leftY = settings.ch3ServoType || 'SG90';
+                RC_CONFIG.servoTypes.leftX = settings.ch4ServoType || 'SG90';
                 return settings;
             }
             return null;
@@ -767,7 +896,11 @@
                 rightYReverse: RC_CONFIG.reverse.rightY,
                 rightXReverse: RC_CONFIG.reverse.rightX,
                 leftYReverse: RC_CONFIG.reverse.leftY,
-                leftXReverse: RC_CONFIG.reverse.leftX
+                leftXReverse: RC_CONFIG.reverse.leftX,
+                ch1ServoType: RC_CONFIG.servoTypes.rightY,
+                ch2ServoType: RC_CONFIG.servoTypes.rightX,
+                ch3ServoType: RC_CONFIG.servoTypes.leftY,
+                ch4ServoType: RC_CONFIG.servoTypes.leftX
             };
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
         }
@@ -782,6 +915,12 @@
             if (saved && saved.obnizId) {
                 obnizInput.value = saved.obnizId;
             }
+
+            // サーボタイプを設定画面に反映
+            document.getElementById('ch1ServoType').value = RC_CONFIG.servoTypes.rightY;
+            document.getElementById('ch2ServoType').value = RC_CONFIG.servoTypes.rightX;
+            document.getElementById('ch3ServoType').value = RC_CONFIG.servoTypes.leftY;
+            document.getElementById('ch4ServoType').value = RC_CONFIG.servoTypes.leftX;
 
             // トリム値を設定画面に反映
             document.getElementById('settingsRightYTrim').textContent = RC_CONFIG.trims.rightY;
@@ -833,6 +972,39 @@
             }
         }
 
+        // サーボタイプ変更
+        function updateServoType(channel, servoType) {
+            const channelMap = {
+                'ch1': 'rightY',
+                'ch2': 'rightX',
+                'ch3': 'leftY',
+                'ch4': 'leftX'
+            };
+            
+            RC_CONFIG.servoTypes[channelMap[channel]] = servoType;
+            
+            // 接続中であればサーボレンジを更新
+            if (servos.rightY && servos.rightX && servos.leftY && servos.leftX) {
+                updateServoRanges();
+                updateServos();
+            }
+        }
+
+        // サーボレンジ更新
+        function updateServoRanges() {
+            if (!servos.rightY || !servos.rightX || !servos.leftY || !servos.leftX) return;
+
+            const rightYRange = SERVO_TYPES[RC_CONFIG.servoTypes.rightY];
+            const rightXRange = SERVO_TYPES[RC_CONFIG.servoTypes.rightX];
+            const leftYRange = SERVO_TYPES[RC_CONFIG.servoTypes.leftY];
+            const leftXRange = SERVO_TYPES[RC_CONFIG.servoTypes.leftX];
+
+            servos.rightY.range = { min: rightYRange.min, max: rightYRange.max };
+            servos.rightX.range = { min: rightXRange.min, max: rightXRange.max };
+            servos.leftY.range = { min: leftYRange.min, max: leftYRange.max };
+            servos.leftX.range = { min: leftXRange.min, max: leftXRange.max };
+        }
+
         // Obniz接続
         async function connectObniz() {
             const saved = loadSettings();
@@ -867,6 +1039,9 @@
                     servos.rightX = obniz.wired("ServoMotor", RC_CONFIG.pins.rightX);
                     servos.leftY = obniz.wired("ServoMotor", RC_CONFIG.pins.leftY);
                     servos.leftX = obniz.wired("ServoMotor", RC_CONFIG.pins.leftX);
+
+                    // サーボレンジを設定
+                    updateServoRanges();
 
                     // 全サーボを中央位置に設定
                     servos.rightY.angle(90);
@@ -1031,11 +1206,11 @@
 
         // 表示更新
         function updateDisplay() {
-            // PWM値とサーボ角度の計算（反転適用）
-            const rightYPwm = calculatePWM(currentValues.rightY, RC_CONFIG.trims.rightY * 0.1, RC_CONFIG.reverse.rightY);
-            const rightXPwm = calculatePWM(currentValues.rightX, RC_CONFIG.trims.rightX * 0.1, RC_CONFIG.reverse.rightX);
-            const leftYPwm = calculatePWM(currentValues.leftY, RC_CONFIG.trims.leftY * 0.1, RC_CONFIG.reverse.leftY);
-            const leftXPwm = calculatePWM(currentValues.leftX, RC_CONFIG.trims.leftX * 0.1, RC_CONFIG.reverse.leftX);
+            // PWM値とサーボ角度の計算（反転とサーボタイプ適用）
+            const rightYPwm = calculatePWM(currentValues.rightY, RC_CONFIG.trims.rightY * 0.1, RC_CONFIG.reverse.rightY, RC_CONFIG.servoTypes.rightY);
+            const rightXPwm = calculatePWM(currentValues.rightX, RC_CONFIG.trims.rightX * 0.1, RC_CONFIG.reverse.rightX, RC_CONFIG.servoTypes.rightX);
+            const leftYPwm = calculatePWM(currentValues.leftY, RC_CONFIG.trims.leftY * 0.1, RC_CONFIG.reverse.leftY, RC_CONFIG.servoTypes.leftY);
+            const leftXPwm = calculatePWM(currentValues.leftX, RC_CONFIG.trims.leftX * 0.1, RC_CONFIG.reverse.leftX, RC_CONFIG.servoTypes.leftX);
 
             const rightYAngle = calculateServoAngle(currentValues.rightY, RC_CONFIG.trims.rightY, RC_CONFIG.reverse.rightY);
             const rightXAngle = calculateServoAngle(currentValues.rightX, RC_CONFIG.trims.rightX, RC_CONFIG.reverse.rightX);
@@ -1085,6 +1260,20 @@
         document.getElementById('emergencyStop').addEventListener('click', emergencyStop);
         document.getElementById('settingsBtn').addEventListener('click', () => showSettings(false));
 
+        // サーボタイプ変更イベントリスナー
+        document.getElementById('ch1ServoType').addEventListener('change', (e) => {
+            updateServoType('ch1', e.target.value);
+        });
+        document.getElementById('ch2ServoType').addEventListener('change', (e) => {
+            updateServoType('ch2', e.target.value);
+        });
+        document.getElementById('ch3ServoType').addEventListener('change', (e) => {
+            updateServoType('ch3', e.target.value);
+        });
+        document.getElementById('ch4ServoType').addEventListener('change', (e) => {
+            updateServoType('ch4', e.target.value);
+        });
+
         // 設定画面のイベントリスナー
         document.getElementById('saveSettings').addEventListener('click', () => {
             const obnizId = document.getElementById('settingsObnizId').value.trim();
@@ -1092,6 +1281,12 @@
                 alert('Obniz IDを入力してください');
                 return;
             }
+
+            // サーボタイプを設定に反映
+            RC_CONFIG.servoTypes.rightY = document.getElementById('ch1ServoType').value;
+            RC_CONFIG.servoTypes.rightX = document.getElementById('ch2ServoType').value;
+            RC_CONFIG.servoTypes.leftY = document.getElementById('ch3ServoType').value;
+            RC_CONFIG.servoTypes.leftX = document.getElementById('ch4ServoType').value;
 
             saveSettings(obnizId);
             hideSettings();
@@ -1119,8 +1314,19 @@
             RC_CONFIG.reverse.rightX = saved.rightXReverse || false;
             RC_CONFIG.reverse.leftY = saved.leftYReverse || false;
             RC_CONFIG.reverse.leftX = saved.leftXReverse || false;
+
+            // 保存されたサーボタイプに戻す
+            RC_CONFIG.servoTypes.rightY = saved.ch1ServoType || 'SG90';
+            RC_CONFIG.servoTypes.rightX = saved.ch2ServoType || 'SG90';
+            RC_CONFIG.servoTypes.leftY = saved.ch3ServoType || 'SG90';
+            RC_CONFIG.servoTypes.leftX = saved.ch4ServoType || 'SG90';
             
             // 設定画面の表示も元に戻す
+            document.getElementById('ch1ServoType').value = RC_CONFIG.servoTypes.rightY;
+            document.getElementById('ch2ServoType').value = RC_CONFIG.servoTypes.rightX;
+            document.getElementById('ch3ServoType').value = RC_CONFIG.servoTypes.leftY;
+            document.getElementById('ch4ServoType').value = RC_CONFIG.servoTypes.leftX;
+
             document.getElementById('settingsRightYTrim').textContent = RC_CONFIG.trims.rightY;
             document.getElementById('settingsRightXTrim').textContent = RC_CONFIG.trims.rightX;
             document.getElementById('settingsLeftYTrim').textContent = RC_CONFIG.trims.leftY;
